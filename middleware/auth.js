@@ -7,7 +7,7 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
 	// 1. get token from req.cookies
 	const { bk_token } = req.cookies
 
-	if (!bk_token) return next(new AppError("Please login to continue", 400))
+	if (!bk_token) return next(new AppError("Please login to continue", 401))
 
 	// 2. decode token if available
 	const decode = jwt.verify(bk_token, process.env.JWT_SECRET)
@@ -27,7 +27,7 @@ exports.isAuthenticated = catchAsync(async (req, res, next) => {
 	// 4. check if password changed after jwt was issued
 
 	if (user.changedPasswordAfter(decode.iat))
-		return next(new AppError("User recently changed thier password"))
+		return next(new AppError("User recently changed thier password", 400))
 
 	// 5. set user to the request object
 	req.user = user

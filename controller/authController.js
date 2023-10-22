@@ -68,6 +68,7 @@ exports.register = catchAsync(async (req, res, next) => {
 
 // Activate user
 exports.activateUser = catchAsync(async (req, res, next) => {
+	console.log(req.body.activationToken)
 	// 1. Verify token
 	const userData = jwt.verify(
 		req.body.activationToken,
@@ -78,6 +79,7 @@ exports.activateUser = catchAsync(async (req, res, next) => {
 	if (!userData) return next(new AppError("your token is wrong", 400))
 
 	let user = await User.findOne({ email: userData.email })
+
 	// 3. if there is a user, throw error else create user
 	if (user) {
 		return next(new AppError("User already exist", 400))
@@ -96,7 +98,7 @@ exports.activateUser = catchAsync(async (req, res, next) => {
 	// 6. send response
 	res.status(201).json({
 		success: true,
-		user,
+		// user,
 	})
 })
 
@@ -109,7 +111,7 @@ exports.login = catchAsync(async (req, res, next) => {
 
 	// 2.check if user exist
 	if (!dbUser) {
-		next(new AppError("we don't have a user with that email", 404))
+		next(new AppError("we don't have a user with that email", 400))
 	} else {
 		// 3. compare passwords
 		const comparePassword = await dbUser.comparePassword(

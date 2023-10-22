@@ -11,6 +11,23 @@ cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_NAME,
 })
 
+// get seller product
+exports.getSellerOtherProducts = (req, res, next) => {
+	req.query.limit = 20
+	req.query.user = req.params.userId
+	req.query.fields = "images title originalPrice discountPrice createdAt"
+
+	next()
+}
+
+// recommended product
+exports.getRecommendedProducts = (req, res, next) => {
+	req.query.limit = 20
+	req.query.category = req.params.category
+
+	next()
+}
+
 // createProduct
 exports.createProduct = catchAsync(async (req, res, next) => {
 	const productData = req.body
@@ -148,10 +165,16 @@ exports.updateManyProduct = catchAsync(async (req, res, next) => {
 exports.deleteImage = catchAsync(async (req, res, next) => {
 	const { publicId } = req.body
 
-	await cloudinary.uploader.destroy(publicId)
-
-	res.status(200).json({
-		success: true,
-		message: "Image deleted successfully",
-	})
+	try {
+		await cloudinary.uploader.destroy(publicId)
+		res.status(201).json({
+			success: true,
+			message: "Image deleted successfully",
+		})
+	} catch (error) {
+		res.status(400).json({
+			success: false,
+			error,
+		})
+	}
 })

@@ -11,19 +11,19 @@ cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_NAME,
 })
 
-// get seller product
-exports.getSellerOtherProducts = (req, res, next) => {
-	req.query.limit = 20
+// seller other items
+exports.getSellerOtherItems = (req, res, next) => {
 	req.query.user = req.params.userId
-	req.query.fields = "images title originalPrice discountPrice createdAt"
+	req.query.limit = 20
+	req.query.fields = "title originalPrice createdAt user images"
 
 	next()
 }
 
-// recommended product
-exports.getRecommendedProducts = (req, res, next) => {
-	req.query.limit = 20
+// seller other items
+exports.getCategories = (req, res, next) => {
 	req.query.category = req.params.category
+	req.query.limit = 30
 
 	next()
 }

@@ -67,7 +67,19 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 		(value) => `$${value}`
 	)
 
-	let query = Product.find(JSON.parse(queryString))
+	let parsedQuery = JSON.parse(queryString)
+
+	if (parsedQuery.originalPrice) {
+		if (parsedQuery.originalPrice.$gt) {
+			parsedQuery.originalPrice.$gt = parseInt(parsedQuery.originalPrice.$gt)
+		} else if (parsedQuery.originalPrice.$lt) {
+			parsedQuery.originalPrice.$lt = parseInt(parsedQuery.originalPrice.$lt)
+		} else {
+			parsedQuery.originalPrice = parseInt(parsedQuery.originalPrice)
+		}
+	}
+
+	let query = Product.find(parsedQuery)
 
 	// Sorting
 	if (req.query.sort) {
@@ -102,12 +114,42 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
 	const products = await query
 
+	const catArray = await Product.aggregate([
+		{
+			$match: parsedQuery,
+		},
+		{
+			$group: {
+				_id: "$category",
+				count: { $sum: 1 },
+			},
+		},
+		{
+			$sort: { count: -1 },
+		},
+	])
+
+	const brandArray = await Product.aggregate([
+		{
+			$group: {
+				_id: "$brand",
+				count: { $sum: 1 },
+			},
+		},
+
+		{
+			$sort: { count: -1 },
+		},
+	])
+
 	res.status(200).json({
 		success: true,
 		productLength: products.length,
 		productCount,
 		totalPages,
 		products,
+		catArray,
+		brandArray,
 	})
 })
 

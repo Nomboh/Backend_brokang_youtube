@@ -7,21 +7,24 @@ const {
 	updateSingleProduct,
 	deleteImage,
 	getSellerOtherItems,
-	getCategories,
+	getRecommendedProducts,
+	productFilters,
+	updateManyProduct,
 } = require("../controller/productController")
 
 const router = express.Router()
 router.route("/").post(isAuthenticated, createProduct)
-router.route("/").get(isAuthenticated, getAllProducts)
+router.route("/").get(isAuthenticated, productFilters, getAllProducts)
 router
 	.route("/seller-other-items/:userId")
-	.get(isAuthenticated, getSellerOtherItems, getAllProducts)
+	.get(isAuthenticated, getSellerOtherItems, productFilters, getAllProducts)
 
 router
 	.route("/recommended/:category")
-	.get(isAuthenticated, getCategories, getAllProducts)
+	.get(isAuthenticated, getRecommendedProducts, productFilters, getAllProducts)
 router.route("/:productId").get(isAuthenticated, getSingleProduct)
 router.route("/:productId").put(isAuthenticated, updateSingleProduct)
+router.route("/update/manyProducts").put(isAuthenticated, updateManyProduct)
 router.route("/deleteImage").post(isAuthenticated, deleteImage)
 
 module.exports = router

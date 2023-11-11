@@ -20,10 +20,48 @@ exports.getSellerOtherItems = (req, res, next) => {
 	next()
 }
 
-// seller other items
-exports.getCategories = (req, res, next) => {
+// get recommended products
+exports.getRecommendedProducts = (req, res, next) => {
 	req.query.category = req.params.category
 	req.query.limit = 30
+
+	next()
+}
+
+// product filters
+exports.productFilters = (req, res, next) => {
+	// { brand: 'samsung', category: 'others' }
+	// Filtering products
+	const queryObject = { ...req.query }
+	const excludedFields = ["page", "sort", "limit", "fields", "id"]
+
+	excludedFields.forEach((el) => delete queryObject[el])
+
+	//  Add search by title
+	if (req.query.title) {
+		queryObject.title = { $regex: req.query.title, $options: "i" }
+	}
+
+	let queryString = JSON.stringify(queryObject)
+
+	queryString = queryString.replace(
+		/\b(gte|gt|lte|lt|in|ne|eq)\b/g,
+		(value) => `$${value}`
+	)
+
+	let parsedQuery = JSON.parse(queryString)
+
+	if (parsedQuery.originalPrice) {
+		if (parsedQuery.originalPrice.$gt) {
+			parsedQuery.originalPrice.$gt = parseInt(parsedQuery.originalPrice.$gt)
+		} else if (parsedQuery.originalPrice.$lt) {
+			parsedQuery.originalPrice.$lt = parseInt(parsedQuery.originalPrice.$lt)
+		} else {
+			parsedQuery.originalPrice = parseInt(parsedQuery.originalPrice)
+		}
+	}
+
+	req.parsedQuery = parsedQuery
 
 	next()
 }
@@ -48,36 +86,10 @@ exports.createProduct = catchAsync(async (req, res, next) => {
 
 // get all products
 exports.getAllProducts = catchAsync(async (req, res, next) => {
-	// { brand: 'samsung', category: 'others' }
 	// Filtering products
-	const queryObject = { ...req.query }
-	const excludedFields = ["page", "sort", "limit", "fields", "id"]
+	const { parsedQuery } = req
 
-	excludedFields.forEach((el) => delete queryObject[el])
-
-	//  Add search by title
-	if (req.query.title) {
-		queryObject.title = { $regex: req.query.title, $options: "i" }
-	}
-
-	let queryString = JSON.stringify(queryObject)
-
-	queryString = queryString.replace(
-		/\b(gte|gt|lte|lt|in|ne)\b/g,
-		(value) => `$${value}`
-	)
-
-	let parsedQuery = JSON.parse(queryString)
-
-	if (parsedQuery.originalPrice) {
-		if (parsedQuery.originalPrice.$gt) {
-			parsedQuery.originalPrice.$gt = parseInt(parsedQuery.originalPrice.$gt)
-		} else if (parsedQuery.originalPrice.$lt) {
-			parsedQuery.originalPrice.$lt = parseInt(parsedQuery.originalPrice.$lt)
-		} else {
-			parsedQuery.originalPrice = parseInt(parsedQuery.originalPrice)
-		}
-	}
+	console.log(parsedQuery)
 
 	let query = Product.find(parsedQuery)
 
@@ -116,11 +128,26 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
 	const catArray = await Product.aggregate([
 		{
-			$match: parsedQuery,
+			$match: parsedQuery || {},
 		},
 		{
 			$group: {
 				_id: "$category",
+				count: { $sum: 1 },
+			},
+		},
+		{
+			$sort: { count: -1 },
+		},
+	])
+
+	const statusArray = await Product.aggregate([
+		{
+			$match: parsedQuery || {},
+		},
+		{
+			$group: {
+				_id: "$status",
 				count: { $sum: 1 },
 			},
 		},
@@ -150,6 +177,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 		products,
 		catArray,
 		brandArray,
+		statusArray,
 	})
 })
 
@@ -192,7 +220,7 @@ exports.updateManyProduct = catchAsync(async (req, res, next) => {
 	const updateOperation = updatedItems.map((item) => ({
 		updateOne: {
 			filter: { _id: item._id },
-			update: item,
+			update: { $set: item },
 		},
 	}))
 

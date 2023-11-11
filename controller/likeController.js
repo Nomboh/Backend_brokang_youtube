@@ -29,7 +29,7 @@ exports.unlike = catchAsync(async (req, res, next) => {
 
 // get user likes
 exports.getUserLikes = catchAsync(async (req, res, next) => {
-	const likes = await Like.find({ user: req.user.id })
+	const likes = await Like.find({ user: req.user.id }).populate("product")
 
 	res.status(200).json({
 		success: true,

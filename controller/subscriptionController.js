@@ -19,11 +19,12 @@ exports.createSubscription = catchAsync(async (req, res, next) => {
 
 	res.status(201).json({
 		success: true,
+		sellerId,
 		message: "Subscription successful",
 	})
 })
 
-// subscribe to a seller
+// delete a subscription
 exports.deleteSubscription = catchAsync(async (req, res, next) => {
 	const { sellerId } = req.params
 	const user = req.user
@@ -32,6 +33,7 @@ exports.deleteSubscription = catchAsync(async (req, res, next) => {
 
 	res.status(200).json({
 		success: true,
+		sellerId,
 		message: "You unsubscribed from this seller",
 	})
 })
@@ -48,7 +50,7 @@ exports.getAllSubscriptions = catchAsync(async (req, res, next) => {
 	})
 })
 
-// check is user is subscribe to a seller
+// check if user is subscribe to a seller
 exports.checkSubscription = catchAsync(async (req, res, next) => {
 	const existingSubscription = await Subscription.findOne({
 		seller: req.params.sellerId,

@@ -37,7 +37,7 @@ router.route("/updatePassword").put(isAuthenticated, updatePassword)
 
 // user routes
 router.route("/").get(isAuthenticated, restrictToAdmin("admin"), getUsers)
-router.route("/:userId").get(isAuthenticated, getSingleUser)
+router.route("/:userId").get(getSingleUser)
 router.route("/me").put(isAuthenticated, updateMe)
 router.route("/address/addAddress").put(isAuthenticated, addAddress)
 router

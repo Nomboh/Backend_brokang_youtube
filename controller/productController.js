@@ -2,6 +2,8 @@ const Product = require("../model/productModel")
 const User = require("../model/userModel")
 const catchAsync = require("../utils/catchAsync")
 const AppError = require("../utils/AppError")
+const Subscription = require("../model/subscriptionModel")
+const novu = require("../utils/novu")
 
 const cloudinary = require("cloudinary").v2
 
@@ -77,6 +79,47 @@ exports.createProduct = catchAsync(async (req, res, next) => {
 
 	user.numProducts += 1
 	await user.save()
+
+	// subscribe to inapp notifications
+	if (product) {
+		const topicKey = product._id.toString()
+
+		// get all subscribers
+		const subs = await Subscription.find({ seller: product.user })
+
+		const subscribers = subs.map((sub) => sub.user.toString())
+
+		if (subscribers) {
+			// create a topic
+			await novu.topics.create({
+				key: topicKey,
+				name: product.title,
+			})
+
+			// add subscribers to topic
+			await novu.topics.addSubscribers(topicKey, {
+				subscribers,
+			})
+
+			const workFlow = "brokang_youtube"
+
+			// send notification
+
+			novu.trigger(workFlow, {
+				to: [
+					{
+						type: "Topic",
+						topicKey,
+					},
+				],
+				payload: {
+					title: product.title,
+					productLink: `${process.env.FRONTEND_URL}/${product._id}`,
+					storename: req.user.storename,
+				},
+			})
+		}
+	}
 
 	res.status(201).json({
 		success: true,

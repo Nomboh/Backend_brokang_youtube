@@ -101,7 +101,7 @@ exports.createProduct = catchAsync(async (req, res, next) => {
 				subscribers,
 			})
 
-			const workFlow = "brokang_youtube"
+			const workFlow = "brokang-youtube"
 
 			// send notification
 

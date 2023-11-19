@@ -52,9 +52,7 @@ const userSchema = new mongoose.Schema(
 
 		address: [
 			{
-				label: String,
-				address1: String,
-				address2: String,
+				address: String,
 				addressType: String,
 			},
 		],

@@ -50,6 +50,16 @@ const userSchema = new mongoose.Schema(
 			default: "user",
 		},
 
+		availableBalance: {
+			type: Number,
+			default: 0,
+		},
+
+		accountBalance: {
+			type: Number,
+			default: 0,
+		},
+
 		address: [
 			{
 				address: String,

@@ -111,3 +111,41 @@ exports.removeAddress = catchAsync(async (req, res, next) => {
 		user,
 	})
 })
+
+// add withdrawal account
+exports.addWithdrawalAccount = catchAsync(async (req, res, next) => {
+	const { accountName, accountNumber, bankName, swiftCode } = req.body
+
+	await User.findByIdAndUpdate(req.user.id, {
+		$push: {
+			withdrawalAccounts: {
+				accountName,
+				accountNumber,
+				bankName,
+				swiftCode,
+			},
+		},
+	})
+
+	res.status(200).json({
+		success: true,
+		message: "withdrawal account added successfully",
+	})
+})
+
+exports.removeWithdrawalAccount = catchAsync(async (req, res, next) => {
+	const withdrawalId = req.params.id
+
+	await User.findByIdAndUpdate(req.user.id, {
+		$pull: {
+			withdrawalAccounts: {
+				_id: withdrawalId,
+			},
+		},
+	})
+
+	res.status(200).json({
+		success: true,
+		message: "withdrawal account removed successfully",
+	})
+})

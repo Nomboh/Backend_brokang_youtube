@@ -60,6 +60,15 @@ const userSchema = new mongoose.Schema(
 			default: 0,
 		},
 
+		withdrawalAccounts: [
+			{
+				accountName: String,
+				accountNumber: String,
+				bankName: String,
+				swiftCode: String,
+			},
+		],
+
 		address: [
 			{
 				address: String,

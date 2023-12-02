@@ -20,6 +20,8 @@ const {
 	updateMe,
 	addAddress,
 	removeAddress,
+	addWithdrawalAccount,
+	removeWithdrawalAccount,
 } = require("../controller/userController")
 
 const router = express.Router()
@@ -46,5 +48,10 @@ router
 router
 	.route("/deactivate/:userId")
 	.put(isAuthenticated, restrictToAdmin("admin"), deactiveUser)
+
+router.route("/account/add").post(isAuthenticated, addWithdrawalAccount)
+router
+	.route("/account/remove/:id")
+	.put(isAuthenticated, removeWithdrawalAccount)
 
 module.exports = router

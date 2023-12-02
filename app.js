@@ -17,6 +17,7 @@ const likeRoutes = require("./routes/likeRoutes")
 const conversationRoutes = require("./routes/conversationRoutes")
 const messageRoutes = require("./routes/messageRoutes")
 const paymentRoutes = require("./routes/paymentRoutes")
+const withdrawalRoutes = require("./routes/withdrawalRoute")
 
 dotenv.config()
 
@@ -46,6 +47,7 @@ app.use("/api/v1/like", likeRoutes)
 app.use("/api/v1/conversation", conversationRoutes)
 app.use("/api/v1/message", messageRoutes)
 app.use("/api/v1/payment", paymentRoutes)
+app.use("/api/v1/withdrawal", withdrawalRoutes)
 
 app.all("*", (req, res, next) => {
 	next(

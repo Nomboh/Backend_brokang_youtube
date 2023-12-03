@@ -13,7 +13,7 @@ exports.createMessage = catchAsync(async (req, res, next) => {
 		return new AppError("You can not write to this channel", 400)
 	}
 
-	conversation.lastMessage = message.text
+	conversation.lastMessage = message.image ? "image" : message.text
 	conversation.lastMessageId = req.body.senderId
 
 	await conversation.save()

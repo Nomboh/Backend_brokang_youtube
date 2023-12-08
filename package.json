@@ -4,7 +4,9 @@
   "description": "brokang market",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "node server.js"
+    
   },
   "author": "quentin",
   "license": "ISC",

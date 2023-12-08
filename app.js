@@ -25,7 +25,7 @@ const app = express()
 
 app.use(
 	cors({
-		origin: [`${process.env.FRONTEND_URL}`],
+		origin: ["https://brokang-youtube-frontend.vercel.app"],
 		credentials: true,
 	})
 )

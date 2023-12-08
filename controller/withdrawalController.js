@@ -8,8 +8,6 @@ const novu = require("../utils/novu")
 exports.createWithdrawalRequest = catchAsync(async (req, res, next) => {
 	const { paymentInfo, amount } = req.body
 
-	console.log(req.body.amount)
-
 	const user = await User.findById(req.user.id)
 
 	if (amount > user.availableBalance) {

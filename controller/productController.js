@@ -132,8 +132,6 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 	// Filtering products
 	const { parsedQuery } = req
 
-	console.log(parsedQuery)
-
 	let query = Product.find(parsedQuery)
 
 	// Sorting

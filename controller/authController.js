@@ -68,7 +68,6 @@ exports.register = catchAsync(async (req, res, next) => {
 
 // Activate user
 exports.activateUser = catchAsync(async (req, res, next) => {
-	console.log(req.body.activationToken)
 	// 1. Verify token
 	const userData = jwt.verify(
 		req.body.activationToken,
